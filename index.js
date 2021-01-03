@@ -98,7 +98,6 @@ class GoogleDrive extends GoogleAuth {
       );
       const { status } = filePDF;
       if (status === 200) {
-        console.log('===== PDF:', filePDF);
         return filePDF.data;
       }
       return { message: 'Ошибка экспорта файла!' };
