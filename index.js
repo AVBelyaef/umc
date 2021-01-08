@@ -5,8 +5,8 @@ require('dotenv').config();
 
 class GoogleAuth {
   scopes = ['https://www.googleapis.com/auth/drive'];
-  tokenPath = 'tokenDrive.json';
-  credentials = 'credentialsDrive.json';
+  tokenPath = 'token.json';
+  credentials = 'credentials.json';
 
   async readFile(value) {
     try {
@@ -157,9 +157,14 @@ class GoogleSheets extends GoogleAuth {
 
 class GoogleDocs extends GoogleAuth {
   async replaceFile(fileId, data) {
-
     const auth = await this.authorize();
     const docs = google.docs({ version: 'v1', auth });
+    const validity = data.datePicker
+      ? `, срок её действия до ${data.datePicker} г`
+      : '';
+    const parsePosition = data.position.includes('преподавателя')
+      ? 'преподаватель'
+      : 'концертмейстер';
 
     try {
       const res = await docs.documents.batchUpdate({
@@ -214,6 +219,15 @@ class GoogleDocs extends GoogleAuth {
             {
               replaceAllText: {
                 containsText: {
+                  text: '{{ONLYPOSITION}}',
+                  matchCase: true,
+                },
+                replaceText: parsePosition,
+              },
+            },
+            {
+              replaceAllText: {
+                containsText: {
                   text: '{{RADIOHAVECATEGORY}}',
                   matchCase: true,
                 },
@@ -223,10 +237,19 @@ class GoogleDocs extends GoogleAuth {
             {
               replaceAllText: {
                 containsText: {
+                  text: '{{RADIOISCATEGORY}}',
+                  matchCase: true,
+                },
+                replaceText: data.radioIsCategory,
+              },
+            },
+            {
+              replaceAllText: {
+                containsText: {
                   text: '{{DATEPICKER}}',
                   matchCase: true,
                 },
-                replaceText: data.datePicker,
+                replaceText: validity,
               },
             },
             {
