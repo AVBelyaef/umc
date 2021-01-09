@@ -10,7 +10,7 @@ class GoogleAuth {
 
   async readFile(value) {
     try {
-      const data = await fs.readFile(value);
+      const data = await fs.readFile(`${__dirname}/${value}`);
       return JSON.parse(data);
     } catch (error) {
       return console.log('Error loading file:', error);
@@ -52,7 +52,7 @@ class GoogleAuth {
       oAuth2Client.getToken(code, (err, token) => {
         if (err) return console.error('Error retrieving access token', err);
         oAuth2Client.setCredentials(token);
-        fs.writeFile(this.tokenPath, JSON.stringify(token), (err) => {
+        fs.writeFile(`${__dirname}/${this.tokenPath}`, JSON.stringify(token), (err) => {
           if (err) return console.error(err);
           console.log('Token stored to', TOKEN_PATH);
         });
