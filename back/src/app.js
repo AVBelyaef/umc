@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/files/:id', (req, res) => {
+app.get('/temp/:id', (req, res) => {
   res.status(200).sendFile(`${__dirname}/temp/${req.params.id}`);
 });
 
@@ -67,7 +67,7 @@ app.post('/users', async (req, res) => {
     await sheets.appendRow(arrData);
     const filePDF = await drive.exportFile(fileId);
 
-    await fs.writeFile(`temp/${dateNow}.pdf`, Buffer.from(filePDF));
+    await fs.writeFile(`${__dirname}/temp/${dateNow}.pdf`, Buffer.from(filePDF));
     await fileName();
 
     return res.status(200).send(`/temp/${dateNow}.pdf`);

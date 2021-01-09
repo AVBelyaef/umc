@@ -380,7 +380,6 @@ function App() {
         >
           <ReCAPTCHA
             sitekey={keyReCaptcha}
-            // onChange={onChangeCAPTCHA}
             hl='ru'
           />
         </Form.Item>
@@ -390,16 +389,6 @@ function App() {
           </Button>
         </Form.Item>
       </Form>
-      {pdf && (
-        <Button
-          type='primary'
-          shape='round'
-          icon={<DownloadOutlined />}
-          href={'http://localhost:5000' + pdf}
-        >
-          Скачать
-        </Button>
-      )}
     </>
   );
 }
