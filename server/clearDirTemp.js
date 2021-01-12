@@ -15,7 +15,7 @@ const fileName = async () => {
     const name = await fs.readdir(`${__dirname}/temp/`);
     const arrFileName = selectFileDelete(name);
     arrFileName.forEach(async (element) => {
-      await fs.rm(`${__dirname}/temp/${element}`);
+      await fs.unlink(`${__dirname}/temp/${element}`);
     });
     console.log('- delete -', arrFileName);
   } catch (error) {
