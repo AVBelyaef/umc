@@ -165,7 +165,6 @@ class GoogleDocs extends GoogleAuth {
     const parsePosition = data.position.includes('преподавателя')
       ? 'преподаватель'
       : 'концертмейстер';
-
     try {
       const res = await docs.documents.batchUpdate({
         documentId: fileId,
@@ -213,7 +212,7 @@ class GoogleDocs extends GoogleAuth {
                   text: '{{RADIOWONTCATEGORY}}',
                   matchCase: true,
                 },
-                replaceText: data.radioWontCategory,
+                replaceText: data.radioWantCategory,
               },
             },
             {

@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 const { GoogleDrive, GoogleSheets, GoogleDocs } = require('./index');
 const { fileName } = require('./clearDirTemp');
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../client/build/')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -49,6 +49,7 @@ app.post('/users', async (req, res) => {
     },
   );
   const data = await response.json();
+
   if (!data.success) {
     return res
       .status(500)
@@ -56,7 +57,7 @@ app.post('/users', async (req, res) => {
   }
   delete body.reCaptcha;
 
-  const arrData = Object.values({ a: 1 });
+  const arrData = Object.values(body);
   const docs = new GoogleDocs();
   const sheets = new GoogleSheets();
   const drive = new GoogleDrive();
@@ -70,9 +71,9 @@ app.post('/users', async (req, res) => {
     await fs.writeFile(`${__dirname}/temp/${dateNow}.pdf`, Buffer.from(filePDF));
     await fileName();
 
-    return res.status(200).send(`/temp/${dateNow}.pdf`);
+    return res.status(200).send({ file: `/temp/${dateNow}.pdf` });
   } catch (error) {
-    res.status(500).send({ message: 'Ошибка записи в таблицу!', error });
+    return res.status(500).send({ message: 'Ошибка записи в таблицу!', error });
   }
 });
 

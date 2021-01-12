@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import React, { useEffect, useState } from 'react';
 import {
   Form,
@@ -7,7 +8,7 @@ import {
   Radio,
   DatePicker,
   Checkbox,
-  notification,
+  Alert,
   Spin,
 } from 'antd';
 import InputMask from 'react-input-mask';
@@ -16,6 +17,7 @@ import moment from 'moment';
 import 'moment/locale/ru';
 import locale from 'antd/es/date-picker/locale/ru_RU';
 import { DownloadOutlined } from '@ant-design/icons';
+import './App.css';
 
 const { Option } = Select;
 const dateFormat = 'DD.MM.YYYY';
@@ -59,6 +61,7 @@ function App() {
   const [pdf, setPdf] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const keyReCaptcha = '6LdyZh8aAAAAAIeED-eQ2kIjiO9vm6kqzJ8Dvuvo';
   useEffect(() => {
     (async () => {
       try {
@@ -77,11 +80,6 @@ function App() {
         console.log('error: ', error);
         setIsLoading(false);
         setIsError({ message: 'Ошибка загрузки образовательных учреждений!' });
-        openNotificationWithIcon('error', {
-          message: 'Ошибка',
-          description:
-            'Неудалось загрузить образовательные учреждения! Обновите страницу или попробуйте зайти позже.',
-        });
       }
     })();
   }, []);
@@ -103,6 +101,7 @@ function App() {
       ...values,
       agreement,
     };
+    console.log('....', data)
     try {
       setIsLoading(true);
       const response = await fetch('/users', {
@@ -112,28 +111,23 @@ function App() {
         },
         body: JSON.stringify(data),
       });
-      onReset();
-      const result = await response.text();
-      openNotificationWithIcon('error', result);
+      console.log('response: ', response);
+      if (response.ok) {
+        const result = await response.json();
+        console.log('result: ', result);
 
-      setRadioVaule(hideCategory);
-      setPdf(result);
+        setPdf(result.file);
+        setIsLoading(false);
+        onReset();
+        return;
+      }
       setIsLoading(false);
+      setIsError({ message: 'Ошибка, документ не создан!' });
     } catch (error) {
       console.log('Ошибка, данные не отправлены!', error);
+      setIsLoading(false);
+      setIsError({ message: 'Ошибка, данные не отправлены!' });
     }
-  };
-
-  const openNotificationWithIcon = (
-    type,
-    { message, description },
-    duration = 0
-  ) => {
-    notification[type]({
-      message,
-      description,
-      duration,
-    });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -149,44 +143,55 @@ function App() {
     });
   };
 
-  function disabledDate(current) {
-    return (
-      (current && current.year() < moment().year()) ||
-      (current && current.year() > moment().add(3, 'months').year())
-    );
+  const disabledDate = (current) => (
+    (current && current.year() < moment().year()) ||
+    (current && current.year() > moment().add(3, 'months').year())
+  );
+
+  const removeAbbreviations = (institution) => {
+    return institution.replace(/(((^[Мм][а-я]+)|(^[Г][а-я]+)) (([а-я]+) ){4,})/mg,"")
   }
 
   if (isLoading) {
     return (
-      <div className='spin'>
-        <Spin size='large' tip='Загрузка ...' />
+      <div className="spinner">
+        <Spin size="large" tip="Загрузка ..." />
       </div>
     );
   }
 
   if (pdf) {
     return (
-      <div className='spin'>
+      <div className="spinner">
         <div>Нажмите кнопку, чтобы сохранить или распечатать файл.</div>
         <Button
-          type='primary'
-          shape='round'
+          type="primary"
+          shape="round"
           icon={<DownloadOutlined />}
-          href={'http://localhost:5000' + pdf}
+          href={pdf}
         >
           Открыть
         </Button>
       </div>
     );
   }
-  const keyReCaptcha = process.env.REACT_APP_COPY_SITE_KEY;
+
+  if(isError) {
+    return (
+      <Alert
+      message="Error"
+      description={isError.message}
+      type="error"
+      showIcon
+    />
+    )
+  }
 
   return (
-    <>
-      {isError && <p>{isError.message}</p>}
+    <div className="container">
       <Form
         {...layout}
-        name='nest-messages'
+        name="nest-messages"
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         validateMessages={validateMessages}
@@ -202,8 +207,8 @@ function App() {
         scrollToFirstError
       >
         <Form.Item
-          name='name'
-          label='Ф.И.О. в род. падеже'
+          name="name"
+          label="Ф.И.О. в род. падеже"
           validateFirst
           rules={[
             {
@@ -217,8 +222,8 @@ function App() {
           <Input />
         </Form.Item>
         <Form.Item
-          name='phone'
-          label='Телефон'
+          name="phone"
+          label="Телефон"
           validateFirst
           rules={[
             {
@@ -233,43 +238,43 @@ function App() {
             },
           ]}
         >
-          <InputMask mask='8(999)999-99-99'>
+          <InputMask mask="8(999)999-99-99">
             {(inputProps) => (
-              <Input {...inputProps} type='tel' disableUnderline={true} />
+              <Input {...inputProps} type="tel" disableUnderline={true} />
             )}
           </InputMask>
         </Form.Item>
         <Form.Item
-          name='email'
-          label='Email'
+          name="email"
+          label="Email"
           rules={[{ type: 'email', required: true }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          name='institutions'
-          label='Название учреждения'
+          name="institutions"
+          label="Название учреждения"
           rules={[{ required: true }]}
         >
           <Select
-            placeholder='Выберите из списка или введите номер школы'
+            placeholder="Выберите из списка или введите номер школы"
             showSearch
             allowClear
           >
             {institutions.map((inst) => (
               <Option value={inst} key={inst}>
-                {inst}
+                {removeAbbreviations(inst)}
               </Option>
             ))}
           </Select>
         </Form.Item>
         <Form.Item
-          name='position'
-          label='Должность'
+          name="position"
+          label="Должность"
           rules={[{ required: true }]}
         >
           <Select
-            placeholder='Выберите из списка или начните вводить'
+            placeholder="Выберите из списка или начните вводить"
             showSearch
             allowClear
           >
@@ -281,96 +286,101 @@ function App() {
           </Select>
         </Form.Item>
         <Form.Item
-          name='radioHaveCategory'
-          label='Квалификационную категорию'
+          name="radioHaveCategory"
+          label="Квалификационную категорию"
           rules={[{ required: true }]}
         >
           <Radio.Group onChange={onChangeRadio}>
-            <Radio value='не имею'>не имею</Radio>
-            <Radio value='имел(а)'>имел(а)</Radio>
-            <Radio value='имею'>имею</Radio>
+            <Radio value="не имею">не имею</Radio>
+            <Radio value="имел(а)">имел(а)</Radio>
+            <Radio value="имею">имею</Radio>
           </Radio.Group>
         </Form.Item>
         {isCategory && (
           <>
             <Form.Item
-              name='radioIsCategory'
+              name="radioIsCategory"
               label={radioValue.charAt(0).toUpperCase() + radioValue.slice(1)}
               rules={[{ required: true, message: 'Выберите категорию!' }]}
             >
               <Radio.Group>
-                <Radio value='первую'>первую категорию</Radio>
-                <Radio value='высшую'>высшую категорию</Radio>
+                <Radio value="первую">первую категорию</Radio>
+                <Radio value="высшую">высшую категорию</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
-              name='datePicker'
-              label='Дата оканчания аттестации'
+              name="datePicker"
+              label="Дата оканчания аттестации"
               rules={[{ required: true, message: 'Выберите дату!' }]}
             >
               <DatePicker
                 locale={locale}
                 format={dateFormat}
-                // dateRender={(current) => {
-                //   const style = {};
-                //   if (current.date() === moment().weekday(-5).date()) {
-                //     style.border = '1px solid #1890ff';
-                //     style.borderRadius = '50%';
-                //   }
-                //   return (
-                //     <div className='ant-picker-cell-inner' style={style}>
-                //       {current.date()}
-                //     </div>
-                //   );
-                // }}
+                dateRender={(current) => {
+                  const month = moment(current.format('YYYY-MM-DD')).endOf('month');
+                  let lastWednesdayOfTheMonth = month.weekday(2).date();
+                  if (lastWednesdayOfTheMonth < 22) {
+                    lastWednesdayOfTheMonth = month.weekday(-5).date();
+                  }
+                  const style = {};
+                  if (current.date() === lastWednesdayOfTheMonth) {
+                    style.border = '1px solid #1890ff';
+                    style.borderRadius = '50%';
+                  }
+                  return (
+                    <div className='ant-picker-cell-inner' style={style}>
+                      {current.date()}
+                    </div>
+                  );
+                }}
               />
             </Form.Item>
           </>
         )}
         <Form.Item
-          name='radioPresence'
-          label='Прошу провести аттестацию'
+          name="radioPresence"
+          label="Прошу провести аттестацию"
           rules={[{ required: true, message: 'Необходимо выбрать!' }]}
         >
           <Radio.Group>
-            <Radio.Button value='без моего присутствия'>
+            <Radio.Button value="без моего присутствия">
               без моего присутствия
             </Radio.Button>
-            <Radio.Button value='в моём присутствии'>
+            <Radio.Button value="в моём присутствии">
               в моём присутствии
             </Radio.Button>
           </Radio.Group>
         </Form.Item>
         <Form.Item
-          name='dateYear'
-          label='Прошу аттестовать в'
+          name="dateYear"
+          label="Прошу аттестовать в"
           rules={[{ required: true, message: 'Выберите год аттестации!' }]}
         >
           <DatePicker
             locale={locale}
-            picker='year'
+            picker="year"
             disabledDate={disabledDate}
           />
         </Form.Item>
         <Form.Item
-          name='radioWantCategory'
-          label='На'
+          name="radioWantCategory"
+          label="Прошу аттестовать на"
           rules={[{ required: true, message: 'Выберите категорию!' }]}
         >
           <Radio.Group>
-            <Radio value='первую'>первую категорию</Radio>
-            {isCategory && <Radio value='высшую'>высшую категорию</Radio>}
+            <Radio value="первую">первую категорию</Radio>
+            {isCategory && <Radio value="высшую">высшую категорию</Radio>}
           </Radio.Group>
         </Form.Item>
-        <Form.Item {...tailLayout} name='agreement' valuePropName='checked'>
-          <Checkbox>Согласие на обработку прерсональных данных</Checkbox>
+        <Form.Item {...tailLayout} name="agreement" valuePropName="checked">
+          <Checkbox>Согласие на обработку персональных данных</Checkbox>
         </Form.Item>
-        <Form.Item name='dateToday' label='Дата подачи заявления'>
+        <Form.Item name="dateToday" label="Дата подачи заявления">
           <DatePicker format={dateFormat} disabled />
         </Form.Item>
         <Form.Item
           {...tailLayout}
-          name='reCaptcha'
+          name="reCaptcha"
           rules={[
             {
               required: true,
@@ -378,18 +388,15 @@ function App() {
             },
           ]}
         >
-          <ReCAPTCHA
-            sitekey={keyReCaptcha}
-            hl='ru'
-          />
+          <ReCAPTCHA sitekey={keyReCaptcha} hl="ru" />
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type='primary' htmlType='submit'>
+          <Button type="primary" htmlType="submit">
             Submit
           </Button>
         </Form.Item>
       </Form>
-    </>
+    </div>
   );
 }
 
