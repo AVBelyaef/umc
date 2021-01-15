@@ -10,17 +10,17 @@ const selectFileDelete = (name) => name.reduce((acc, file) => {
   return acc;
 }, []);
 
-const fileName = async () => {
+const removePDF = async () => {
   try {
     const name = await fs.readdir(`${__dirname}/temp/`);
     const arrFileName = selectFileDelete(name);
     arrFileName.forEach(async (element) => {
       await fs.unlink(`${__dirname}/temp/${element}`);
     });
-    console.log('- delete -', arrFileName);
+    console.log('- delete PDF  -', arrFileName);
   } catch (error) {
-    console.log('file name ', error);
+    console.log('delete PDF file: ', error);
   }
 };
 
-module.exports = { fileName };
+module.exports = { removePDF };

@@ -7,10 +7,11 @@ const app = express();
 require('dotenv').config();
 
 const port = process.env.PORT || 5000;
+const GoogleDocs = require('./GoogleDocs');
 const GoogleDrive = require('./GoogleDrive');
 const GoogleSheets = require('./GoogleSheets');
-const GoogleDocs = require('./GoogleDocs');
-const { fileName } = require('./clearDirTemp');
+
+const { removePDF } = require('./clearDirTemp');
 
 app.use(express.static(path.join(__dirname, '../client/build/')));
 // app.use(express.urlencoded({ extended: true }));
@@ -23,28 +24,19 @@ app.get('/temp/:id', (req, res) => {
 app.get('/institutions', async (req, res) => {
   try {
     const sheets = new GoogleSheets();
-    const institutions = await sheets.getSheets();
-    const position = [];
-    const inst = institutions.map((item) => {
-      if (item[1]) {
-        position.push(item[1]);
-      }
-      return item[0];
-    });
-    const data = [inst, position];
-    // const data = result.reduce(
-    //   // eslint-disable-next-line arrow-body-style
-    //   (acc, [institution, position]) => {
-    //     return [...acc, [...acc[0], ...acc[1], position ? [position] : []]];
-    //   },
-    //   [[], []],
-    // );
-    // console.log('>>>>', data);
+    const result = await sheets.getSheets();
+    const data = result.reduce(
+      (acc, [institution, position]) => [
+        [...acc[0], institution],
+        [...acc[1], ...(position ? [position] : [])],
+      ],
+      [[], []],
+    );
     res.send(data);
   } catch (error) {
     res
       .status(500)
-      .send({ message: 'Ошибка загрузки образовательных учреждений', error });
+      .send({ message: 'Ошибка загрузки образовательных учреждений!', error });
   }
 });
 
@@ -61,9 +53,7 @@ app.post('/users', async (req, res) => {
   const data = await response.json();
 
   if (!data.success) {
-    return res
-      .status(500)
-      .send({ message: 'Ошибка, подтвердите, что Вы не робот!' });
+    return res.status(400).end();
   }
   delete body.reCaptcha;
 
@@ -82,12 +72,25 @@ app.post('/users', async (req, res) => {
       `${__dirname}/temp/${dateNow}.pdf`,
       Buffer.from(filePDF),
     );
-    await fileName();
-    // TODO: проверка на наличие файла
-    return res.status(200).send({ file: `/temp/${dateNow}.pdf` });
+    const isFile = await fs
+      .access(`./temp/${dateNow}.pdf`)
+      .then(() => true)
+      .catch(() => false);
+
+    if (isFile) {
+      return res.status(200).send({ file: `/temp/${dateNow}.pdf` });
+    }
+    res.status(500).send({ message: 'Ошибка записи в таблицу!' });
   } catch (error) {
-    return res.status(500).send({ message: 'Ошибка записи в таблицу!', error });
+    res.status(500).send({ message: 'Ошибка записи в таблицу!', error });
+  } finally {
+    try {
+      await removePDF();
+    } catch (error) {
+      console.log(error);
+    }
   }
+  return null;
 });
 
 app.listen(port, () => {

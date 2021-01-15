@@ -1,28 +1,27 @@
 /* eslint-disable no-template-curly-in-string */
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Radio, DatePicker, Checkbox } from 'antd';
+import { Form, Button, DatePicker, Checkbox } from 'antd';
 import moment from 'moment';
 import 'moment/locale/ru';
 import locale from 'antd/es/date-picker/locale/ru_RU';
-import DateYear from './components/DateYear';
-import Email from './components/Email';
-import EndDate from './components/EndDate';
-import Error from './components/Error';
 import Institutions from './components/Institutions';
-import Loading from './components/Loading';
+import Position from './components/Position';
 import Name from './components/Name';
 import Phone from './components/Phone';
-import Position from './components/Position';
-import RadioHaveCategory from './components/RadioHaveCategory';
-import RadioIsCategory from './components/RadioIsCategory';
-import RadioPresence from './components/RadioPresence';
-import RadioWantCategory from './components/RadioWantCategory';
+import Email from './components/Email';
 import ReCaptcha from './components/ReCaptcha';
-
+import RadioPresence from './components/RadioPresence';
+import RadioIsCategory from './components/RadioIsCategory';
+import RadioHaveCategory from './components/RadioHaveCategory';
+import RadioWantCategory from './components/RadioWantCategory';
+import EndDate from './components/EndDate';
+import Error from './components/Error';
 import './App.css';
+import Loading from './components/Loading';
+import DateYear from './components/DateYear';
 
 const dateFormat = 'DD.MM.YYYY';
-const dateToday = moment(new Date()).format('DD-MM-YYYY');
+const dateToday = moment().format('DD-MM-YYYY');
 const hideCategory = 'не имею';
 
 const layout = {
@@ -69,7 +68,7 @@ function App() {
           setIsLoading(false);
         } else {
           setIsLoading(false);
-          setIsError(data.message);
+          setIsError(data);
         }
       } catch (error) {
         setIsLoading(false);
@@ -84,6 +83,7 @@ function App() {
 
   const onFinish = async (values) => {
     const agreement = values.agreement === true ? 'да' : 'нет';
+
     if (values.radioHaveCategory === hideCategory) {
       values.datePicker = '';
     } else {
@@ -96,7 +96,7 @@ function App() {
       agreement,
     };
     try {
-      setIsLoading(true);
+      setIsLoading('Подождите, создаём PDF документ.');
       const response = await fetch('/users', {
         method: 'POST',
         headers: {
@@ -111,15 +111,15 @@ function App() {
         onReset();
         return;
       }
+      setIsError({
+        message: 'Ошибка, документ не создан! Повторите попытку позже.',
+      });
       setIsLoading(false);
-      setIsError({ message: 'Ошибка, документ не создан!' });
     } catch (error) {
       setIsLoading(false);
       setIsError({ message: 'Ошибка, данные не отправлены!' });
     }
   };
-
-  const isCategory = radioValue !== hideCategory;
 
   const onChangeRadio = ({ target }) => {
     setRadioVaule(target.value);
@@ -129,7 +129,7 @@ function App() {
   };
 
   if (isLoading) {
-    return <Loading message={isLoading} />;
+    return <Loading isLoading={isLoading} />;
   }
 
   if (pdf) {
@@ -144,8 +144,10 @@ function App() {
   }
 
   if (isError) {
-    return <Error message={isError.message} />;
+    return <Error message={isError.message} />
   }
+
+  const isCategory = radioValue !== hideCategory;
 
   return (
     <div className="container">
@@ -168,8 +170,11 @@ function App() {
         <Name />
         <Phone />
         <Email />
+
         <Institutions institutions={institutions} />
-        <Position positions={positions} />
+
+        <Position position={positions} />
+
         <RadioHaveCategory onChangeRadio={onChangeRadio} />
         {isCategory && (
           <>
