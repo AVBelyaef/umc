@@ -11,7 +11,7 @@ const GoogleDocs = require('./GoogleDocs');
 const GoogleDrive = require('./GoogleDrive');
 const GoogleSheets = require('./GoogleSheets');
 
-const { removePDF } = require('./clearDirTemp');
+const removePDF = require('./clearDirTemp');
 
 app.use(express.static(path.join(__dirname, '../client/build/')));
 // app.use(express.urlencoded({ extended: true }));

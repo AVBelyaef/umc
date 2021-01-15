@@ -23,4 +23,4 @@ const removePDF = async () => {
   }
 };
 
-module.exports = { removePDF };
+module.exports = removePDF;

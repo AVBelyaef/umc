@@ -129,7 +129,7 @@ function App() {
   };
 
   if (isLoading) {
-    return <Loading isLoading={isLoading} />;
+    return <Loading message={isLoading} />;
   }
 
   if (pdf) {
@@ -173,7 +173,7 @@ function App() {
 
         <Institutions institutions={institutions} />
 
-        <Position position={positions} />
+        <Position positions={positions} />
 
         <RadioHaveCategory onChangeRadio={onChangeRadio} />
         {isCategory && (
