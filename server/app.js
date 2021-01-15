@@ -7,11 +7,13 @@ const app = express();
 require('dotenv').config();
 
 const port = process.env.PORT || 5000;
-const { GoogleDrive, GoogleSheets, GoogleDocs } = require('./index');
+const GoogleDrive = require('./GoogleDrive');
+const GoogleSheets = require('./GoogleSheets');
+const GoogleDocs = require('./GoogleDocs');
 const { fileName } = require('./clearDirTemp');
 
 app.use(express.static(path.join(__dirname, '../client/build/')));
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/temp/:id', (req, res) => {
@@ -30,6 +32,14 @@ app.get('/institutions', async (req, res) => {
       return item[0];
     });
     const data = [inst, position];
+    // const data = result.reduce(
+    //   // eslint-disable-next-line arrow-body-style
+    //   (acc, [institution, position]) => {
+    //     return [...acc, [...acc[0], ...acc[1], position ? [position] : []]];
+    //   },
+    //   [[], []],
+    // );
+    // console.log('>>>>', data);
     res.send(data);
   } catch (error) {
     res
@@ -68,9 +78,12 @@ app.post('/users', async (req, res) => {
     await sheets.appendRow(arrData);
     const filePDF = await drive.exportFile(fileId);
 
-    await fs.writeFile(`${__dirname}/temp/${dateNow}.pdf`, Buffer.from(filePDF));
+    await fs.writeFile(
+      `${__dirname}/temp/${dateNow}.pdf`,
+      Buffer.from(filePDF),
+    );
     await fileName();
-
+    // TODO: проверка на наличие файла
     return res.status(200).send({ file: `/temp/${dateNow}.pdf` });
   } catch (error) {
     return res.status(500).send({ message: 'Ошибка записи в таблицу!', error });
