@@ -194,7 +194,7 @@ function App() {
         <ReCaptcha tailLayout={tailLayout} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Submit
+            Отправить
           </Button>
         </Form.Item>
       </Form>
