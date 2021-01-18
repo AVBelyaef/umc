@@ -1,14 +1,14 @@
 import React from 'react';
 import { Form, DatePicker } from 'antd';
 
-const EndDate = ({ locale, dateFormat}) => (
+const Calendar = ({ name, label, locale, dateFormat}) => (
   <Form.Item
-    name="datePicker"
-    label="Дата оканчания аттестации"
+    name={name}
+    label={label}
     rules={[{ required: true, message: 'Выберите дату!' }]}
   >
     <DatePicker locale={locale} format={dateFormat} />
   </Form.Item>
 );
 
-export default EndDate;
+export default Calendar;
