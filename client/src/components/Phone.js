@@ -21,7 +21,7 @@ const Phone = () => (
     ]}
   >
     <InputMask mask="8(999)999-99-99">
-      {(inputProps) => <Input {...inputProps} type="tel" />}
+      {(inputProps) => <Input {...inputProps} type="tel" placeholder="8(XXX)XXX-XX-XX"/>}
     </InputMask>
   </Form.Item>
 );

@@ -7,7 +7,7 @@ const Email = () => (
     label="Email"
     rules={[{ type: 'email', required: true }]}
   >
-    <Input />
+    <Input placeholder="ivanov@yandex.ru"/>
   </Form.Item>
 );
 

@@ -18,7 +18,7 @@ const Name = () => (
       },
     ]}
   >
-    <Input />
+    <Input placeholder="Иванова Ивана Ивановича" />
   </Form.Item>
 );
 

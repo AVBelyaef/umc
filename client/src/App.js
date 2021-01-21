@@ -21,7 +21,7 @@ import Loading from './components/Loading';
 import DateYear from './components/DateYear';
 
 const dateFormat = 'DD.MM.YYYY';
-const dateToday = moment().format('DD-MM-YYYY');
+// const dateToday = moment().format('DD-MM-YYYY');
 const hideCategory = 'не имею';
 
 const layout = {
@@ -89,7 +89,7 @@ function App() {
     } else {
       values.datePicker = values.datePicker.format('DD.MM.YYYY');
     }
-    values.dateToday = values.dateToday.format('LL');
+    // values.dateToday = values.dateToday.format('LL');
     values.dateYear = values.dateYear.format('YYYY');
     const data = {
       ...values,
@@ -162,7 +162,7 @@ function App() {
           agreement: true,
           radioPresence: 'без моего присутствия',
           radioWantCategory: 'первую',
-          dateToday: moment(dateToday, dateFormat),
+          // dateToday: moment(dateToday, dateFormat),
           dateYear: moment().add(3, 'months'),
         }}
         scrollToFirstError
@@ -188,13 +188,13 @@ function App() {
         <Form.Item {...tailLayout} name="agreement" valuePropName="checked">
           <Checkbox>Согласие на обработку персональных данных</Checkbox>
         </Form.Item>
-        <Form.Item name="dateToday" label="Дата подачи заявления">
+        {/* <Form.Item name="dateToday" label="Дата подачи заявления">
           <DatePicker format={dateFormat} disabled />
-        </Form.Item>
+        </Form.Item> */}
         <ReCaptcha tailLayout={tailLayout} />
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Submit
+            Отправить
           </Button>
         </Form.Item>
       </Form>

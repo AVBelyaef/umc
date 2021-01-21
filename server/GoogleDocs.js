@@ -115,15 +115,15 @@ class GoogleDocs extends GoogleAuth {
                 replaceText: data.email,
               },
             },
-            {
-              replaceAllText: {
-                containsText: {
-                  text: '{{DATETODAY}}',
-                  matchCase: true,
-                },
-                replaceText: data.dateToday,
-              },
-            },
+            // {
+            //   replaceAllText: {
+            //     containsText: {
+            //       text: '{{DATETODAY}}',
+            //       matchCase: true,
+            //     },
+            //     replaceText: data.dateToday,
+            //   },
+            // },
             {
               replaceAllText: {
                 containsText: {
