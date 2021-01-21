@@ -1,9 +1,10 @@
 /* eslint-disable no-template-curly-in-string */
 import React, { useEffect, useState } from 'react';
-import { Form, Button, DatePicker, Checkbox } from 'antd';
+import { Form, Button, Checkbox } from 'antd';
 import moment from 'moment';
 import 'moment/locale/ru';
 import locale from 'antd/es/date-picker/locale/ru_RU';
+
 import Institutions from './components/Institutions';
 import Position from './components/Position';
 import Name from './components/Name';
@@ -14,11 +15,11 @@ import RadioPresence from './components/RadioPresence';
 import RadioIsCategory from './components/RadioIsCategory';
 import RadioHaveCategory from './components/RadioHaveCategory';
 import RadioWantCategory from './components/RadioWantCategory';
-import EndDate from './components/EndDate';
+import Calendar from './components/Calendar';
 import Error from './components/Error';
-import './App.css';
 import Loading from './components/Loading';
 import DateYear from './components/DateYear';
+import './App.css';
 
 const dateFormat = 'DD.MM.YYYY';
 // const dateToday = moment().format('DD-MM-YYYY');
@@ -87,7 +88,7 @@ function App() {
     if (values.radioHaveCategory === hideCategory) {
       values.datePicker = '';
     } else {
-      values.datePicker = values.datePicker.format('DD.MM.YYYY');
+      values.datePicker =  moment(values.datePicker).format('DD.MM.YYYY');
     }
     // values.dateToday = values.dateToday.format('LL');
     values.dateYear = values.dateYear.format('YYYY');
@@ -134,9 +135,9 @@ function App() {
 
   if (pdf) {
     return (
-      <div className="spinner">
+      <div className='spinner'>
         <div>Нажмите кнопку, чтобы сохранить или распечатать файл.</div>
-        <Button type="primary" shape="round" href={pdf}>
+        <Button type='primary' shape='round' href={pdf}>
           Открыть
         </Button>
       </div>
@@ -144,16 +145,16 @@ function App() {
   }
 
   if (isError) {
-    return <Error message={isError.message} />
+    return <Error message={isError.message} />;
   }
 
   const isCategory = radioValue !== hideCategory;
 
   return (
-    <div className="container">
+    <div className='container'>
       <Form
         {...layout}
-        name="nest-messages"
+        name='nest-messages'
         onFinish={onFinish}
         validateMessages={validateMessages}
         form={form}
@@ -179,21 +180,30 @@ function App() {
         {isCategory && (
           <>
             <RadioIsCategory radioValue={radioValue} />
-            <EndDate locale={locale} dateFormat={dateFormat} />
+            <Calendar
+              name='datePicke'
+              label='Дата оканчания аттестации'
+              locale={locale}
+              dateFormat={dateFormat}
+            />
           </>
         )}
         <RadioPresence />
         <DateYear />
         <RadioWantCategory isCategory={isCategory} />
-        <Form.Item {...tailLayout} name="agreement" valuePropName="checked">
+        <Form.Item {...tailLayout} name='agreement' valuePropName='checked'>
           <Checkbox>Согласие на обработку персональных данных</Checkbox>
         </Form.Item>
-        {/* <Form.Item name="dateToday" label="Дата подачи заявления">
-          <DatePicker format={dateFormat} disabled />
-        </Form.Item> */}
+        {/* <Calendar
+          name='dateToday'
+          label='Дата подачи заявления'
+          locale={locale}
+          dateFormat={dateFormat}
+        /> */}
+
         <ReCaptcha tailLayout={tailLayout} />
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button type='primary' htmlType='submit'>
             Отправить
           </Button>
         </Form.Item>
