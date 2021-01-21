@@ -181,7 +181,7 @@ function App() {
           <>
             <RadioIsCategory radioValue={radioValue} />
             <Calendar
-              name='datePicke'
+              name='datePicker'
               label='Дата оканчания аттестации'
               locale={locale}
               dateFormat={dateFormat}
